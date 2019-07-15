@@ -1,0 +1,173 @@
+#define HELLO
+#ifdef HELLO
+
+#define _CRT_SECURE_NO_WARNINGS
+
+
+#define MAX_STR_LEN 19
+#define MAX_RECORDS 50000
+#define MAX_FIELD 5
+#define NULL 0
+
+
+typedef enum
+{
+	NAME,
+	NUMBER,
+	BIRTHDAY, 
+	EMAIL,
+	MEMO
+} FIELD;
+
+typedef struct
+{
+	int count;
+	char str[20];
+} RESULT;
+
+typedef struct Node{
+	struct Node* Nxt[MAX_FIELD];
+	struct Node* Prv[MAX_FIELD];
+	char str[MAX_FIELD][MAX_STR_LEN + 1];
+}Record;
+
+
+Record RecArray[MAX_RECORDS];
+Record RecMemoryPool[MAX_RECORDS * 2];
+int rCounter;
+
+int hash(char *str){
+	unsigned long hash = 5381;
+	int c;
+	while (c = *str++){
+		hash = (((hash << 5) + hash) + c) % MAX_RECORDS;
+	}
+	return hash % MAX_RECORDS;
+}
+
+int mstrcmp(char* s1, char* s2){
+	while ((*s1 != '\0') && (*s1 == *s2)){
+		s1++;
+		s2++;
+	}
+	return (*s1 - *s2);
+}
+
+void mstrcpy(char dst[], char src[]){
+	int i = 0;
+	while (src[i]){
+		dst[i] = src[i];
+		i++;
+	}
+	dst[i] = '\0';
+}
+
+void DeleteRecordInFieldLink(Record* record, int field){
+	Record* tmp = record->Nxt[field];
+	if (tmp)
+		tmp->Prv[field] = record->Prv[field];
+	tmp = record->Prv[field];
+	if (tmp)
+		tmp->Nxt[field] = record->Nxt[field];
+}
+
+void AddRecordInFieldLink(Record* record, int field){
+	int hkey = hash(record->str[field]);
+	Record* tmp = RecArray[hkey].Nxt[field];
+	if (tmp != NULL)
+		tmp->Prv[field] = record;
+	record->Nxt[field] = tmp;
+	record->Prv[field] = &RecArray[hkey];
+	RecArray[hkey].Nxt[field] = record;
+}
+
+void InitDB(){
+	int i = 0;
+	rCounter = 0;
+	for (; i < MAX_RECORDS; i++){
+		int j = 0;
+		for (; j < MAX_FIELD; j++){
+			RecArray[i].Nxt[j] = NULL;
+		}
+	}
+}
+
+void InitRecord(Record* rec){
+	int i = 0;
+	if (rec){
+		for (; i < MAX_FIELD; i++){
+			rec->str[i][0] = '\0';
+			rec->Nxt[i] = NULL;
+			rec->Prv[i] = NULL;
+		}
+	}
+}
+
+void Add(char* name, char* number, char* birthday, char* email, char* memo){
+	//Record* rec = new Record;
+	Record* rec = &RecMemoryPool[rCounter];
+	rCounter++;
+	InitRecord(rec);
+	mstrcpy(rec->str[NAME], name);
+	mstrcpy(rec->str[NUMBER], number);
+	mstrcpy(rec->str[BIRTHDAY], birthday);
+	mstrcpy(rec->str[EMAIL], email);
+	mstrcpy(rec->str[MEMO], memo);
+	int i = 0;
+	for (; i < MAX_FIELD; i++)
+		AddRecordInFieldLink(rec, i);
+}
+
+int Delete(FIELD field, char* str){
+	int hkey = hash(str);
+	Record* rec = RecArray[hkey].Nxt[field];
+	int count = 0;
+	while (rec){
+		Record* nxt = rec->Nxt[field];
+		if (!mstrcmp(str, rec->str[field])){
+			count++;
+			int i = 0;
+			for (; i < MAX_FIELD; i++)
+				DeleteRecordInFieldLink(rec, i);
+
+			//delete rec;
+		}
+		rec = nxt;
+	}
+	return count;
+}
+
+int Change(FIELD field, char* str, FIELD changefield, char* changestr){
+	int hkey = hash(str);
+	Record* rec = RecArray[hkey].Nxt[field];
+	int count = 0;
+	while (rec){
+		Record* nxt = rec->Nxt[field];
+		if (!mstrcmp(rec->str[field], str)){
+			count++;
+			DeleteRecordInFieldLink(rec, changefield);
+			mstrcpy(rec->str[changefield], changestr);
+			AddRecordInFieldLink(rec, changefield);
+		}
+		rec = nxt;
+	}
+	return count;
+}
+
+RESULT Search(FIELD field, char* str, FIELD returnfield){
+	int hkey = hash(str);
+	RESULT res;
+	Record* rec = RecArray[hkey].Nxt[field];
+	res.count = 0;
+	while (rec){
+		Record* nxt = rec->Nxt[field];
+		if (!mstrcmp(str, rec->str[field])){
+			res.count++;
+			mstrcpy(res.str, rec->str[returnfield]);
+		}
+		rec = nxt;
+	}
+	return res;
+}
+
+#endif
