@@ -1,0 +1,146 @@
+Main:-
+               
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+extern void processThis(char *operation, int size);
+extern int storeOutput(char out[102][30]);
+
+int main()
+{
+    int T, n;
+    string operation;
+
+    cin >> T;
+    while(T--)
+    {
+		cin >> n;
+        while(n--)
+        {
+            cin >> operation;
+            processThis((char*)operation.c_str(), operation.size());
+        }
+        char out[102][30];
+        int c = storeOutput(out);
+        
+        cout << c << endl;
+        for(int i=0; i<c; ++i)
+            cout << out[i] << endl;
+    }
+    return 0;
+}
+
+User: 
+
+#define MAX 101
+#define EMPTY 0
+#define DELETED -1
+#define OCCUPIED 1
+
+char table[MAX][30];
+int  state[MAX] = { EMPTY };
+
+int compareStr(char *s1, char *s2) {
+	while (*s1 && *s1 == *s2)
+		s1++, s2++;
+
+	return(*s1 - *s2);
+}
+
+void copyStr(char *d, char *s) {
+	while (*d++ = *s++);
+}
+
+int hashValue(char *str) {
+	int h = 0, i = 0;
+	while (str[i]) {
+		h = h + (str[i] * (i + 1));
+		i++;
+	}
+	h = (h * 19) % MAX;
+	return h;
+}
+
+bool insertString(char *str) {
+	int h = hashValue(str);
+	int steps = 1, i = h;
+	while (steps < 21 && state[i] != EMPTY) {
+		if (state[i] != DELETED && compareStr(str, table[i]) == 0) {
+			return true;
+		}
+		i = (h + steps * steps + 23 * steps) % MAX;
+		steps++;
+	}
+
+	steps = 1;
+	i = h;
+	while (steps < 21 && state[i] != EMPTY && state[i] != DELETED) {
+		i = (h + steps * steps + 23 * steps) % MAX;
+		steps++;
+	}
+
+	if (steps < 21){
+		copyStr(table[i], str);
+		state[i] = OCCUPIED;
+	}
+	return true;
+}
+
+bool deleteString(char *str) {
+	int h = hashValue(str);
+	int steps = 1;
+	int i = h;
+	while (steps < 21 && state[i] != EMPTY) {
+		if (compareStr(str, table[i]) == 0) {
+			state[i] = DELETED;
+			return true;
+		}
+		i = (h + steps * steps + 23 * steps) % MAX;
+		steps++;
+	}
+	return false;
+}
+
+void clearHash() {
+	for (int i = 0; i < MAX; i++)
+		state[i] = EMPTY;
+}
+
+void processThis(char *operation, int size){
+	if (operation[0] == 'A')
+		insertString(&operation[4]);
+	else
+		deleteString(&operation[4]);
+}
+
+int storeOutput(char out[102][30])
+{
+	int len = 0;
+
+	for (int i = 0; i <= MAX; i++) {
+		if (state[i] == OCCUPIED) {
+			int num = i;
+			int j = 0;
+			if (num > 99) {
+				out[len][j++] = '1';
+				out[len][j++] = '0';
+				out[len][j++] = num % 10 + '0';
+			}
+			else if (num > 9 && num < 100) {
+				out[len][j++] = num / 10 + '0';
+				out[len][j++] = num % 10 + '0';
+			}
+			else {
+				out[len][j++] = num + '0';
+			}
+
+			out[len][j++] = ':';
+			copyStr(&out[len][j], table[i]);
+			len++;
+		}
+	}
+	clearHash();
+	return len;
+}
