@@ -1,0 +1,440 @@
+Write the followings 5 APIs thatthe contact DataBase must provide. 
+
+
+
+ 
+
+
+
+ 
+
+                                                                                                                                                                                                
+
+
+InitDB()
+ 
+
+ 
+ 
+void InitDB()
+ 
+
+ 
+ 
+- Initializes the DataBase
+ 
+
+ 
+ 
+Parameters:
+ 
+
+ 
+ 
+Returns:
+ 
+
+Add()
+ 
+
+ 
+ 
+void Add(char* name, char* number, char* birthday, char* email, char* memo)
+ 
+
+ 
+ 
+- Adds one record to the DataBase.
+
+- A record contains of 5 fields such as name, number, birthday, email, memo.
+ 
+
+ 
+ 
+Parameters:
+ 
+
+ 
+ 
+name
+ 
+: NAME field value
+ 
+
+ 
+ 
+number
+ 
+: NUMBER field value
+ 
+
+ 
+ 
+birthday
+ 
+: BIRTHDAY field value
+ 
+
+ 
+ 
+email
+ 
+: EMAIL field value
+ 
+
+ 
+ 
+memo
+ 
+: MEMO field value
+ 
+
+ 
+ 
+Returns:
+ 
+
+Delete()
+ 
+
+ 
+ 
+int Delete(FIELD field, char* str)
+ 
+
+ 
+ 
+- Delete record(s) which field value is matched to str.
+ 
+
+ 
+ 
+Parameters:
+ 
+
+ 
+ 
+field
+ 
+: field information
+ 
+
+ 
+ 
+str
+ 
+: field value of record to delete
+ 
+
+ 
+ 
+Returns:
+ 
+
+ 
+ 
+int
+ 
+: number of deleted records. If there is no deleted record, 0
+ 
+
+Change()
+ 
+
+ 
+ 
+int Change(FIELD field, char* str, FIELD changefield, char* changestr)
+ 
+
+ 
+ 
+-Finds record(s) which field value is matched to str. then changes the changefield value of the corresponding record(s) to changestr
+ 
+
+ 
+ 
+Parameters:
+ 
+
+ 
+ 
+field
+ 
+: field information
+ 
+
+ 
+ 
+str
+ 
+: field value
+ 
+
+ 
+ 
+changefield
+ 
+: information of field to change
+ 
+
+ 
+ 
+changestr
+ 
+: value of field to change
+ 
+
+ 
+ 
+Returns:
+ 
+
+ 
+ 
+int
+ 
+: number of changed records, If there is no changed record, 0
+ 
+
+Search()
+ 
+
+ 
+ 
+RESULT Search(FIELD field, char* str, FIELD returnfield)
+ 
+
+ 
+ 
+- Finds record(s) which field value is matched to str. The number of records and the returnfield value of record are returned. 
+ 
+
+ 
+
+ 
+ 
+Parameters:
+ 
+
+ 
+ 
+field
+ 
+: field information
+ 
+
+ 
+ 
+str
+ 
+: field value
+ 
+
+ 
+ 
+returnfield
+ 
+: information of field to return
+ 
+
+ 
+ 
+Returns:
+ 
+
+ 
+ 
+count
+ 
+: number of records which field value is matched to str
+ 
+
+ 
+ 
+str
+ 
+: returnfield value of corresponding record
+
+if the count value is 0 or greater than or equal to 2, str is ignored.
+ 
+    
+
+
+
+[Table3]
+
+
+
+ 
+
+
+
+ 
+
+
+
+[Constraints]
+
+
+
+1.The maximum number of records for each test case is less than or equal to50,000. 
+
+
+
+2.At the beginning of each test case, the InitDB() function is called. 
+
+
+
+3.Each field value given in the input is created with the same format as for thefield that is created in the make_field() function. 
+
+
+
+4.In case of the Delete(), Change(), Search() function, there may be severalnumber of records which field value is matched to str parameter.
+
+
+
+ 
+
+
+
+[Example]
+
+
+
+Thecode below is exemplary. Thus, may differ from the actual input data.
+
+
+
+ 
+
+                                                            
+
+
+Input
+ 
+Result
+ 
+
+Add(“A”, “111”, “0101”, “a.com”, “aaa”);
+ 
+ 
+ 
+
+Add(“B”, “222”, “0202”, “b.com”, “bbb”);
+ 
+ 
+ 
+
+Add(“C”, “333”, “0303”, “c.com”, “ccc”);
+ 
+ 
+ 
+
+Add(“D”, “444”, “0505”, “d.com”, “ddd”);
+ 
+ 
+ 
+
+Add(“E”, “555”, “0505”, “e.com”, “eee”);
+ 
+ 
+ 
+
+result = Search(NAME, “A”, EMAIL);
+ 
+result.count = 1;
+
+result.str = “a.com”;
+ 
+
+Change(NAME, “A”, EMAIL, “d.com”);
+ 
+result = 1;
+ 
+
+result = Search(NAME, “A”, EMAIL);
+ 
+result.count = 1;
+
+result.str = “d.com”;
+ 
+
+Delete(NUMBER, “777”);
+ 
+result = 0;
+ 
+
+result = Search(BIRTHDAY, “0505”, MEMO);
+ 
+result.count = 2;
+
+result.str = “”; // result.str value is ignored
+ 
+
+Delete(EMAIL, “d.com”);
+ 
+result = 2;
+ 
+
+result = Search(NAME, “A”, EMAIL);
+ 
+result.count = 0;
+
+result.str = “”; // result.str value is ignored
+ 
+
+Change(BIRTHDAY, “0505”, MEMO, “zzz”);
+ 
+result = 1;
+ 
+
+result = Search(NAME, “E”, MEMO);
+ 
+result.count = 1;
+
+result.str = “zzz”;
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+[Input/ Output]
+
+
+
+Theinput/output are processed in the Main part code. Thus, a separate input/outputfunction must not be used in the User Code part. 
+
+
+
+ 
+
+
+
+Theoutput result will be given in a format as shown below. (Output value is exemplary.Thus, may differ from the actual output value).
+
+
+
+ 
+
+   
+
+
+#1 1000
+
+#2 1000
+
+#3 1000
+
+#4 1000
+
+#5 1000
+
+TotalScore = 5000
+ 
